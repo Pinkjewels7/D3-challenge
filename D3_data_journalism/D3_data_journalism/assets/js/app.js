@@ -35,11 +35,11 @@ d3.csv("assets/data/data.csv")
     // Step 2: Create scale functions
     // ==============================
     var xLinearScale = d3.scaleLinear()
-      .domain([0, d3.max(data, d => d.healthcare)])
+      .domain([0, d3.max(data, d => d.poverty)])
       .range([0, width]);
 
     var yLinearScale = d3.scaleLinear()
-      .domain([0, d3.max(data, d => d.poverty)])
+      .domain([0, d3.max(data, d => d.healthcare)])
       .range([height, 0]);
 
     // Step 3: Create axis functions
@@ -56,17 +56,34 @@ d3.csv("assets/data/data.csv")
     chartGroup.append("g")
       .call(leftAxis);
 
-    // Step 5: Create Circles
+    // Step 5a: Create Circles
     // ==============================
     var circlesGroup = chartGroup.selectAll("circle")
     .data(data)
     .enter()
     .append("circle")
-    .attr("cx", d => xLinearScale(d.healthcare))
-    .attr("cy", d => yLinearScale(d.poverty))
+    .attr("cx", d => xLinearScale(d.poverty))
+    .attr("cy", d => yLinearScale(d.healthcare-0.2))
     .attr("r", "10")
     .attr("fill", "blue")
     .attr("opacity", ".5");
+
+    // Step 5b: Label Circles
+    // ==============================
+    chartGroup.append("text")
+    .style("font-size", "12px")
+    .selectAll("tspan")
+    .data(data)
+    .enter()
+    .append("tspan")
+    .attr("x", d => xLinearScale(d.poverty))
+    .attr("y", d => yLinearScale(d.healthcare-0.2))
+    .text(d =>d.abbr)
+    .attr("text-anchor", "middle")
+    .attr("font-family", "sans-serif")
+    .attr("font-size", ".10px")
+    .attr("font-weight", "bold")
+    .attr("fill", "white");
 
 
     // Step 6: Initialize tool tip
@@ -91,16 +108,6 @@ d3.csv("assets/data/data.csv")
       .on("mouseout", function(data, index) {
         toolTip.hide(data);
       });
-
-    // Create Circle Labels from state abbr 
-    circlesGroup.append('text')
-      .attr('text-anchor', 'middle')
-      .attr('alignment-baseline', 'middle')
-      .style('font-size', d => d.radius * 0.4 + 'px')
-      .attr('fill-opacity', 0)
-      .attr('fill', 'white')
-      .data(data)
-      .text(d => d.abbr.text) 
 
     // Create axes labels
     chartGroup.append("text")
